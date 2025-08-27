@@ -1,10 +1,12 @@
-package br.com.studybuddy.debugattor.bootstrap;
+package br.com.studybuddy.debugattor.infrastructure.bootstrap;
 
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "br.com.studybuddy.debugattor")
 public class Application {
 
     public static void main(final String... args) {
