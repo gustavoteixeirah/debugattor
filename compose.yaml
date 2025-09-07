@@ -1,9 +1,24 @@
+version: "3"
 services:
-  postgres:
-    image: 'postgres:latest'
+  db:
+    image: postgres:16
+    restart: no
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
-      - 'POSTGRES_DB=debugattor'
-      - 'POSTGRES_PASSWORD=debugattor'
-      - 'POSTGRES_USER=debugattor'
+      POSTGRES_USER: debugattor
+      POSTGRES_PASSWORD: debugattor
+      POSTGRES_DB: debugattor
+    volumes:
+      - postgres:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - '5432'
+      - "5432:5432"
+
+volumes:
+  postgres:
+  postgres_data:
