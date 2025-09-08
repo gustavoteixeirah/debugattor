@@ -2,6 +2,7 @@ package com.teixeirah.debugattor.infrastructure.primary;
 
 import com.teixeirah.debugattor.application.usecases.FetchExecutionsUseCase;
 import com.teixeirah.debugattor.application.usecases.GetExecutionByIdUseCase;
+import com.teixeirah.debugattor.application.usecases.RegisterStepUseCase;
 import com.teixeirah.debugattor.application.usecases.StartExecutionUseCase;
 import com.teixeirah.debugattor.domain.execution.Execution;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ class ExecutionHttpAdapter {
     private final StartExecutionUseCase startExecutionUseCase;
     private final FetchExecutionsUseCase fetchExecutionsUseCase;
     private final GetExecutionByIdUseCase getExecutionByIdUseCase;
+    private final RegisterStepUseCase registerStepUseCase;
 
     @PostMapping
     ResponseEntity<Execution> startExecution() {
@@ -27,14 +29,24 @@ class ExecutionHttpAdapter {
 
     @GetMapping
     ResponseEntity<List<Execution>> fetchExecutions() {
-        return ResponseEntity.ok(fetchExecutionsUseCase.execute());
+        List<Execution> executions = fetchExecutionsUseCase.execute();
+        return ResponseEntity.ok(executions);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<Execution> getExecutionById(@PathVariable UUID id) {
-        return getExecutionByIdUseCase.execute(id)
+    @GetMapping("/{executionId}")
+    ResponseEntity<Execution> getExecutionById(@PathVariable UUID executionId) {
+        return getExecutionByIdUseCase.execute(executionId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{executionId}/steps")
+    ResponseEntity<Execution> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto registerStepDto) {
+        registerStepUseCase.execute(executionId, registerStepDto.name());
+        return getExecutionById(executionId);
+    }
+
+    public record RegisterStepDto(String name) {
     }
 
 }

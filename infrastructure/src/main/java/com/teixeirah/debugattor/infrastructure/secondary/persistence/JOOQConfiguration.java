@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-public class jOOQConfiguration {
+public class JOOQConfiguration {
 
     @Autowired
     private DataSource dataSource;
@@ -28,10 +28,10 @@ public class jOOQConfiguration {
 
     private org.jooq.Configuration dslConfig() {
         final var settings = new Settings()
-                // render in lowercase (matches unquoted Postgres identifiers)
                 .withRenderNameCase(RenderNameCase.LOWER)
-                // never quote names unless you really need to
-                .withRenderQuotedNames(RenderQuotedNames.NEVER);
+                .withRenderQuotedNames(RenderQuotedNames.NEVER)
+                .withMapRecordComponentParameterNames(true)
+                .withMapConstructorParameterNames(true);
 
         final var defaultConfiguration = new DefaultConfiguration();
         defaultConfiguration.set(dataSource)
