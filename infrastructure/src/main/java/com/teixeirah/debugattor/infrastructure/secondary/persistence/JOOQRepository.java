@@ -46,10 +46,13 @@ class JOOQRepository implements ExecutionRepository, StepRepository {
 
     @Override
     public Optional<Execution> findById(UUID id) {
-        return context.select(asterisk())
+        return context.select(asterisk(),
+                        multiset(select(STEPS.ID, STEPS.NAME, STEPS.STATUS, STEPS.REGISTERED_AT, STEPS.COMPLETED_AT)
+                                .from(STEPS).where(STEPS.EXECUTION_ID.eq(EXECUTIONS.ID)))
+                                .as("steps")
+                                .convertFrom(rs -> rs.map(Records.mapping(Step::load)))
+                )
                 .from(EXECUTIONS)
-                .join(Tables.STEPS)
-                .on(EXECUTIONS.ID.eq(Tables.STEPS.EXECUTION_ID))
                 .where(EXECUTIONS.ID.eq(id))
                 .fetchOptionalInto(Execution.class);
     }

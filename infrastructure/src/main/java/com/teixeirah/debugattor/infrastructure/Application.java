@@ -1,4 +1,4 @@
-package com.teixeirah.debugattor.infrastructure.bootstrap;
+package com.teixeirah.debugattor.infrastructure;
 
 
 import org.springframework.boot.SpringApplication;
