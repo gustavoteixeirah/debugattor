@@ -1,9 +1,7 @@
 package com.teixeirah.debugattor.infrastructure.primary;
 
-import com.teixeirah.debugattor.application.usecases.FetchExecutionsUseCase;
-import com.teixeirah.debugattor.application.usecases.GetExecutionByIdUseCase;
-import com.teixeirah.debugattor.application.usecases.RegisterStepUseCase;
-import com.teixeirah.debugattor.application.usecases.StartExecutionUseCase;
+import com.teixeirah.debugattor.application.usecases.*;
+import com.teixeirah.debugattor.domain.artifact.Artifact;
 import com.teixeirah.debugattor.domain.execution.Execution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +19,7 @@ class ExecutionHttpAdapter {
     private final FetchExecutionsUseCase fetchExecutionsUseCase;
     private final GetExecutionByIdUseCase getExecutionByIdUseCase;
     private final RegisterStepUseCase registerStepUseCase;
+    private final LogArtifactUseCase logArtifactUseCase;
 
     @PostMapping
     ResponseEntity<Execution> startExecution() {
@@ -41,12 +40,21 @@ class ExecutionHttpAdapter {
     }
 
     @PostMapping("/{executionId}/steps")
-    ResponseEntity<Execution> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto registerStepDto) {
-        registerStepUseCase.execute(executionId, registerStepDto.name());
+    ResponseEntity<Execution> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto dto) {
+        registerStepUseCase.execute(executionId, dto.name());
         return getExecutionById(executionId);
     }
 
     public record RegisterStepDto(String name) {
+    }
+
+    @PostMapping("/{executionId}/steps/{stepId}/artifacts")
+    ResponseEntity<Artifact> logArtifact(@PathVariable UUID executionId, @PathVariable UUID stepId, @RequestBody LogArtifact dto) {
+        final var artifact = logArtifactUseCase.log(stepId, Artifact.Type.valueOf(dto.type()), dto.content());
+        return ResponseEntity.ok(artifact);
+    }
+
+    public record LogArtifact(String type, String content) {
     }
 
 }

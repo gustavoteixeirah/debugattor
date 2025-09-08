@@ -1,9 +1,7 @@
 package com.teixeirah.debugattor.infrastructure.bootstrap;
 
-import com.teixeirah.debugattor.application.usecases.FetchExecutionsUseCase;
-import com.teixeirah.debugattor.application.usecases.GetExecutionByIdUseCase;
-import com.teixeirah.debugattor.application.usecases.RegisterStepUseCase;
-import com.teixeirah.debugattor.application.usecases.StartExecutionUseCase;
+import com.teixeirah.debugattor.application.usecases.*;
+import com.teixeirah.debugattor.domain.artifact.ArtifactRepository;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
 import com.teixeirah.debugattor.domain.step.StepRepository;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +28,11 @@ public class UseCasesConfiguration {
     @Bean
     public RegisterStepUseCase registerStepUseCase(StepRepository repository) {
         return new RegisterStepUseCase(repository);
+    }
+
+    @Bean
+    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository) {
+        return new LogArtifactUseCase(repository);
     }
 
 }

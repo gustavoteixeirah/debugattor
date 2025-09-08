@@ -1,5 +1,7 @@
 package com.teixeirah.debugattor.domain.artifact;
 
+import java.util.UUID;
+
 public interface ArtifactRepository {
-    Artifact log(Artifact.Type type, String content);
+    Artifact log(UUID stepId, Artifact.Type type, String content);
 }

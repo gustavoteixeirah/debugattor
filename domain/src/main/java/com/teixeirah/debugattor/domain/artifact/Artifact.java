@@ -10,5 +10,9 @@ public record Artifact(UUID id, Artifact.Type type, String content, OffsetDateTi
         LOG, // content will be just a text
         JSON_DATA // content will be a json object
     }
+
+    public static Artifact newArtifact(UUID id, String type, String content, OffsetDateTime loggedAt) {
+        return new Artifact(id, Type.valueOf(type), content, loggedAt);
+    }
 }
 
