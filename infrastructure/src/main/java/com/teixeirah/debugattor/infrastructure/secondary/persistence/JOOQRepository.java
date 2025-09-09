@@ -4,12 +4,15 @@ import com.teixeirah.debugattor.domain.artifact.Artifact;
 import com.teixeirah.debugattor.domain.artifact.ArtifactRepository;
 import com.teixeirah.debugattor.domain.execution.Execution;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
+import com.teixeirah.debugattor.domain.execution.ExecutionNotFoundException;
 import com.teixeirah.debugattor.domain.step.Step;
+import com.teixeirah.debugattor.domain.step.StepNotFoundException;
 import com.teixeirah.debugattor.domain.step.StepRepository;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Records;
+import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -92,20 +95,57 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
 
     @Override
     public void register(UUID executionId, Step step) {
-        context.insertInto(STEPS)
-                .set(STEPS.EXECUTION_ID, executionId)
-                .set(STEPS.NAME, step.name())
-                .set(STEPS.STATUS, step.status().name())
-                .execute();
+        try {
+            context.insertInto(STEPS)
+                    .set(STEPS.EXECUTION_ID, executionId)
+                    .set(STEPS.NAME, step.name())
+                    .set(STEPS.STATUS, step.status().name())
+                    .execute();
+        } catch (DataAccessException dae) {
+            if (isForeignKeyViolation(dae)) {
+                throw new ExecutionNotFoundException(executionId);
+            }
+            throw dae;
+        }
     }
 
     @Override
     public Artifact log(UUID stepId, Artifact.Type type, String content) {
-        return context.insertInto(ARTIFACTS)
-                .set(ARTIFACTS.STEP_ID, stepId)
-                .set(ARTIFACTS.TYPE, type.name())
-                .set(ARTIFACTS.CONTENT, content)
-                .returningResult(asterisk())
-                .fetchOneInto(Artifact.class);
+        try {
+            return context.insertInto(ARTIFACTS)
+                    .set(ARTIFACTS.STEP_ID, stepId)
+                    .set(ARTIFACTS.TYPE, type.name())
+                    .set(ARTIFACTS.CONTENT, content)
+                    .returningResult(asterisk())
+                    .fetchOneInto(Artifact.class);
+        } catch (DataAccessException dae) {
+            if (isForeignKeyViolation(dae)) {
+                throw new StepNotFoundException(stepId);
+            }
+            throw dae;
+        }
+    }
+
+    private static boolean isForeignKeyViolation(Throwable t) {
+        // SQLState 23503 is foreign_key_violation in Postgres
+        Throwable cur = t;
+        while (cur != null) {
+            String msg = cur.getMessage();
+            if (msg != null && msg.contains("violates foreign key constraint")) {
+                return true;
+            }
+            try {
+                // Try to reflectively check SQLState if present (e.g., PSQLException)
+                var method = cur.getClass().getMethod("getSQLState");
+                Object state = method.invoke(cur);
+                if (state != null && "23503".equals(state.toString())) {
+                    return true;
+                }
+            } catch (Exception ignore) {
+                // ignore, continue scanning cause chain
+            }
+            cur = cur.getCause();
+        }
+        return false;
     }
 }

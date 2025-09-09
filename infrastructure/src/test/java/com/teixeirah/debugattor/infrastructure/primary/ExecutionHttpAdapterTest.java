@@ -12,6 +12,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.UUID;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -103,6 +105,19 @@ class ExecutionHttpAdapterTest {
     }
 
     @Test
+    void registerStepOnNonExistingExecutionReturns404() {
+        String nonExistingId = UUID.randomUUID().toString();
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"compile\"}")
+                .when()
+                .post("/api/executions/{id}/steps", nonExistingId)
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
     void logArtifact() {
         // 1) Create execution
         String executionId =
@@ -163,6 +178,24 @@ class ExecutionHttpAdapterTest {
                                 "find { it.id == '%s' }.steps.find { it.id == '%s' }.artifacts.find { it.type == 'LOG' && it.content == 'Converted to BW' }",
                                 executionId, stepId),
                         notNullValue());
+    }
+
+    @Test
+    void logArtifactOnNonExistingStepReturns404() {
+        String nonExistingId = UUID.randomUUID().toString();
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "type":"LOG",
+                            "content":"Converted to BW"
+                        }
+                        """)
+                .when()
+                .post("/api/executions/{executionId}/steps/{stepId}/artifacts", nonExistingId, nonExistingId)
+                .then()
+                .statusCode(404);
     }
 
 }
