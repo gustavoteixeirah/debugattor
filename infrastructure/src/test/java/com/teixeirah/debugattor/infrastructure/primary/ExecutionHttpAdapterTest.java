@@ -101,4 +101,68 @@ class ExecutionHttpAdapterTest {
                 .contentType(ContentType.JSON)
                 .body("id", equalTo(id));
     }
+
+    @Test
+    void logArtifact() {
+        // 1) Create execution
+        String executionId =
+                given()
+                        .when()
+                        .post("/api/executions")
+                        .then()
+                        .statusCode(allOf(greaterThanOrEqualTo(200), lessThan(300)))
+                        .extract().path("id");
+
+        // 2) Register a step
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Converted to BW\"}")
+                .when()
+                .post("/api/executions/{id}/steps", executionId)
+                .then()
+                .statusCode(allOf(greaterThanOrEqualTo(200), lessThan(300)));
+
+        // 3) Fetch execution to get the stepId
+        String stepId =
+                given()
+                        .when()
+                        .get("/api/executions/{id}", executionId)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .path("steps[0].id");
+
+        // 4) Log an artifact for that step
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"type\":\"LOG\",\"content\":\"Converted to BW\"}")
+                .when()
+                .post("/api/executions/{execId}/steps/{stepId}/artifacts", executionId, stepId)
+                .then()
+                .statusCode(allOf(greaterThanOrEqualTo(200), lessThan(300)))
+                .contentType(ContentType.JSON)
+                .body("id", notNullValue())
+                .body("type", equalTo("LOG"))
+                .body("content", equalTo("Converted to BW"))
+                .body("loggedAt", notNullValue());
+
+        // 5) Assert via GET /api/executions (fetch all) that the artifact is persisted under the correct execution/step
+        given()
+                .when()
+                .get("/api/executions")
+                .then()
+                .statusCode(200)
+                // execution exists
+                .body(String.format("find { it.id == '%s' }", executionId), notNullValue())
+                // step exists under that execution
+                .body(String.format("find { it.id == '%s' }.steps.find { it.id == '%s' }", executionId, stepId), notNullValue())
+                // artifacts not empty
+                .body(String.format("find { it.id == '%s' }.steps.find { it.id == '%s' }.artifacts", executionId, stepId), not(empty()))
+                // an artifact with the expected type/content exists
+                .body(String.format(
+                                "find { it.id == '%s' }.steps.find { it.id == '%s' }.artifacts.find { it.type == 'LOG' && it.content == 'Converted to BW' }",
+                                executionId, stepId),
+                        notNullValue());
+    }
+
 }

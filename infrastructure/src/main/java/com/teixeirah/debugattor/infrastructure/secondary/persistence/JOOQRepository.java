@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Records;
-import org.jooq.generated.Tables;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -72,7 +71,6 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                         .convertFrom(rs -> rs.map(
                                 Records.mapping(Artifact::newArtifact)))
                         .as("artifacts");
-
 
         return context.select(asterisk(),
                         multiset(select(
