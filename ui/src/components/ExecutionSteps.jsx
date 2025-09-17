@@ -9,8 +9,8 @@ export function ExecutionSteps({ execution, onBack }) {
   const failed = steps.filter((s) => s.status === 'FAILED').length
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #0f0f0f, #0b0b0b)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #0f0f0f, #0b0b0b)', width: '100%' }}>
+      <div style={{ padding: '16px', width: '100%' }}>
         {onBack && (
           <div style={{ marginBottom: 16 }}>
             <button onClick={onBack} style={{ background: 'transparent', border: '1px solid #3a3a3a', color: '#aaa', borderRadius: 8, padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -26,10 +26,30 @@ export function ExecutionSteps({ execution, onBack }) {
           <div style={{ fontSize: 13, color: '#aaa' }}>{completed} completed, {running} running, {failed} failed</div>
         </div>
 
-        <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-          <div style={{ display: 'flex', gap: 16, minWidth: 'max-content' }}>
+        <div style={{
+          overflowX: 'auto',
+          paddingBottom: 8,
+        }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 16,
+              minWidth: 0,
+              flexDirection: 'row',
+            }}
+          >
             {steps.map((step, index) => (
-              <div key={step.id} style={{ flex: '0 0 320px', width: 320 }}>
+              <div
+                key={step.id}
+                style={{
+                  flex: '1 1 320px',
+                  minWidth: 260,
+                  maxWidth: 400,
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
                 <StepCard step={step} index={index} />
               </div>
             ))}

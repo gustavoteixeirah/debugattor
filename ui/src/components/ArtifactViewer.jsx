@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Image, FileText, Code, Download, Eye, EyeOff } from 'lucide-react'
 
 export function ArtifactViewer({ artifacts }) {
-  const [expanded, setExpanded] = useState(new Set())
+  const [expanded, setExpanded] = useState(() => new Set(artifacts ? artifacts.map(a => a.id) : []))
 
   const toggle = (id) => {
     const next = new Set(expanded)
@@ -34,7 +34,7 @@ export function ArtifactViewer({ artifacts }) {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <div style={{ display: 'grid', gap: 8, width: '100%' }}>
       {artifacts.map((artifact) => {
         const isExpanded = expanded.has(artifact.id)
         const name = artifact.name || artifact.id
@@ -74,12 +74,15 @@ export function ArtifactViewer({ artifacts }) {
 function renderContent(artifact) {
   switch (artifact.type) {
     case 'IMAGE':
+      if (!artifact.content) return <div style={{ color: '#888', fontSize: 12 }}>No image data</div>
       return (
-        <img
-          src={`data:image/png;base64,${artifact.content}`}
-          alt={artifact.name || artifact.id}
-          style={{ maxWidth: '100%', height: 'auto', borderRadius: 6, border: '1px solid #2f2f2f', maxHeight: 180, objectFit: 'contain', background: '#111' }}
-        />
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#111', borderRadius: 6, border: '1px solid #2f2f2f', minHeight: 80, maxHeight: 220, overflow: 'auto' }}>
+          <img
+            src={`${artifact.content}`}
+            alt={artifact.name || artifact.id}
+            style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 6, display: 'block' }}
+          />
+        </div>
       )
     case 'LOG':
       return (

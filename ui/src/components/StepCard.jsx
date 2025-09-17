@@ -24,7 +24,7 @@ export function StepCard({ step, index }) {
     : (start && end ? Math.max(0, new Date(end) - new Date(start)) : null)
 
   return (
-    <div style={{ border: '1px solid #2f2f2f', background: '#1e1e1e', borderRadius: 10, padding: 12, height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <div style={{ border: '1px solid #2f2f2f', background: '#1e1e1e', borderRadius: 10, padding: 12, minHeight: 200, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#aaa', background: '#111', padding: '2px 6px', borderRadius: 4 }}>{(index || 0) + 1}</span>
