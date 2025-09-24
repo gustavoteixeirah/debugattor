@@ -16,7 +16,6 @@ export default function ExecutionsList() {
         const data = await fetchExecutions()
         if (mounted) setExecutions(data)
       } catch (e) {
-        setError('Failed to load executions')
       } finally {
         if (mounted) setLoading(false)
       }
@@ -31,7 +30,7 @@ export default function ExecutionsList() {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #0f0f0f, #0b0b0b)' }}>
       <div style={{ maxWidth: 900, margin: '0 auto', padding: 16 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 12 }}>Executions</div>
-        {executions.length === 0 ? (
+        {executions && executions.length === 0 ? (
           <div style={{ color: '#aaa' }}>No executions yet.</div>
         ) : (
           <div style={{ display: 'grid', gap: 10 }}>

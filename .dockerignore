@@ -1,0 +1,14 @@
+# Ignorar arquivos e pastas desnecessários na imagem
+.git
+.github
+*.md
+*.toml
+*.bat
+*.sh
+ui
+build
+.gradle
+out
+*.iml
+.idea
+.vscode

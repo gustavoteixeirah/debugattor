@@ -176,7 +176,40 @@ Response shapes (abbreviated):
 
 ---
 
-## Getting started (local)
+
+## Getting started (end users)
+
+You can run the entire application (backend, frontend, and database) using Docker Compose. No Java, Node.js, or local builds required.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Start the full stack
+
+1. Build and start all services (API, UI, and database):
+
+  ```bash
+  docker compose -f compose-app.yaml up --build -d
+  ```
+
+2. Access the web UI at [http://localhost:3000](http://localhost:3000)
+
+3. The API is available at [http://localhost:8080/api](http://localhost:8080/api)
+
+4. The database runs on port 5432 (PostgreSQL).
+
+### Stopping services
+
+To stop all containers:
+
+```bash
+docker compose -f compose-app.yaml down
+```
+
+---
+
+## Getting started (local development)
 
 Prerequisites:
 
