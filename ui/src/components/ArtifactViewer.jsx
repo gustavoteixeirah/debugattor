@@ -78,7 +78,7 @@ function renderContent(artifact) {
       return (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#111', borderRadius: 6, border: '1px solid #2f2f2f', minHeight: 80, maxHeight: 220, overflow: 'auto' }}>
           <img
-            src={`${artifact.content}`}
+            src={`data:image/png;base64,${artifact.content}`}
             alt={artifact.name || artifact.id}
             style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 6, display: 'block' }}
           />

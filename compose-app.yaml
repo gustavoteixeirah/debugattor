@@ -8,8 +8,14 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db
+      DB_NAME: debugattor
+      DB_USERNAME: debugattor
+      DB_PASSWORD: debugattor
+      FLYWAY_ENABLED: true
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   frontend:
     build:
       context: ./ui
@@ -31,5 +37,10 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U debugattor"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 volumes:
   db_data:
