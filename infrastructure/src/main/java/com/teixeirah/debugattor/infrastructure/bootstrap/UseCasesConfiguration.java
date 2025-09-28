@@ -1,5 +1,6 @@
 package com.teixeirah.debugattor.infrastructure.bootstrap;
 
+import com.teixeirah.debugattor.application.output.BucketStorageOutputPort;
 import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.ArtifactRepository;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
@@ -31,8 +32,8 @@ public class UseCasesConfiguration {
     }
 
     @Bean
-    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository) {
-        return new LogArtifactUseCase(repository);
+    public LogArtifactUseCase logArtifactUseCase(BucketStorageOutputPort bucketStorage, ArtifactRepository repository) {
+        return new LogArtifactUseCase(repository, bucketStorage);
     }
 
 }

@@ -16,3 +16,15 @@ spring:
     validate-migration-naming: true
   jackson:
     time-zone: America/Sao_Paulo
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 15MB
+      max-request-size: 20MB
+
+minio:
+  url: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: artifacts
+

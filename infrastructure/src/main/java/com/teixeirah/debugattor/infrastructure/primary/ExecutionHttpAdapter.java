@@ -2,11 +2,14 @@ package com.teixeirah.debugattor.infrastructure.primary;
 
 import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.Artifact;
+import com.teixeirah.debugattor.domain.artifact.FileMetadata;
 import com.teixeirah.debugattor.domain.execution.Execution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,11 +53,28 @@ class ExecutionHttpAdapter {
 
     @PostMapping("/{executionId}/steps/{stepId}/artifacts")
     ResponseEntity<Artifact> logArtifact(@PathVariable UUID executionId, @PathVariable UUID stepId, @RequestBody LogArtifact dto) {
-        final var artifact = logArtifactUseCase.log(stepId, Artifact.Type.valueOf(dto.type()), dto.content());
+        final var artifact = logArtifactUseCase.log(stepId, Artifact.Type.valueOf(dto.type()), dto.description(), dto.content());
         return ResponseEntity.ok(artifact);
     }
 
-    public record LogArtifact(String type, String content) {
+    @PostMapping("/{executionId}/steps/{stepId}/artifacts/upload")
+    public ResponseEntity<Artifact> uploadFile(@PathVariable UUID executionId,
+                                               @PathVariable UUID stepId,
+                                               @ModelAttribute LogArtifact dto) throws IOException {
+        final var file = dto.file();
+        final var metadata = new FileMetadata(file.getOriginalFilename(), file.getContentType(), file.getSize());
+
+        final var artifact = logArtifactUseCase.logFile(stepId,
+                Artifact.Type.valueOf(dto.type()),
+                dto.description(),
+                file.getInputStream(),
+                metadata);
+
+        return ResponseEntity.ok(artifact);
     }
+
+    public record LogArtifact(String type, String description, String content, MultipartFile file) {
+    }
+
 
 }

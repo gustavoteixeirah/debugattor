@@ -40,7 +40,7 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
     public List<Execution> findAll() {
         Field<List<Artifact>> artifactsField =
                 multiset(
-                        select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
+                        select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.DESCRIPTION, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
                                 .from(ARTIFACTS)
                                 .where(ARTIFACTS.STEP_ID.eq(STEPS.ID)))
                         .convertFrom(rs -> rs.map(
@@ -68,7 +68,7 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
     public Optional<Execution> findById(UUID id) {
         Field<List<Artifact>> artifactsField =
                 multiset(
-                        select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
+                        select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.DESCRIPTION, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
                                 .from(ARTIFACTS)
                                 .where(ARTIFACTS.STEP_ID.eq(STEPS.ID)))
                         .convertFrom(rs -> rs.map(
@@ -110,11 +110,12 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
     }
 
     @Override
-    public Artifact log(UUID stepId, Artifact.Type type, String content) {
+    public Artifact log(UUID stepId, Artifact.Type type, String description, String content) {
         try {
             return context.insertInto(ARTIFACTS)
                     .set(ARTIFACTS.STEP_ID, stepId)
                     .set(ARTIFACTS.TYPE, type.name())
+                    .set(ARTIFACTS.DESCRIPTION, description)
                     .set(ARTIFACTS.CONTENT, content)
                     .returningResult(asterisk())
                     .fetchOneInto(Artifact.class);

@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Image, FileText, Code, Download, Eye, EyeOff } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Image, FileText, Code, Eye, EyeOff, X } from 'lucide-react'
 
 export function ArtifactViewer({ artifacts }) {
   const [expanded, setExpanded] = useState(() => new Set(artifacts ? artifacts.map(a => a.id) : []))
+  const [imageModal, setImageModal] = useState(null)
 
   const toggle = (id) => {
     const next = new Set(expanded)
@@ -10,6 +11,23 @@ export function ArtifactViewer({ artifacts }) {
     else next.add(id)
     setExpanded(next)
   }
+
+  const openImageModal = (artifact) => {
+    setImageModal(artifact)
+  }
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && imageModal) {
+        setImageModal(null)
+      }
+    }
+
+    if (imageModal) {
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }
+  }, [imageModal])
 
   const iconFor = (type) => {
     switch (type) {
@@ -37,7 +55,7 @@ export function ArtifactViewer({ artifacts }) {
     <div style={{ display: 'grid', gap: 8, width: '100%' }}>
       {artifacts.map((artifact) => {
         const isExpanded = expanded.has(artifact.id)
-        const name = artifact.name || artifact.id
+        const name = artifact.description || artifact.id
         return (
           <div key={artifact.id} style={{ border: '1px solid #2f2f2f', borderRadius: 8, background: '#1e1e1e' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px' }}>
@@ -54,33 +72,85 @@ export function ArtifactViewer({ artifacts }) {
                 <button onClick={() => toggle(artifact.id)} title={isExpanded ? 'Hide' : 'Show'} style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
                   {isExpanded ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
-                <button onClick={() => downloadArtifact(artifact)} title="Download" style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
-                  <Download size={14} />
-                </button>
               </div>
             </div>
             {isExpanded && (
               <div style={{ padding: '0 10px 10px 10px' }}>
-                {renderContent(artifact)}
+                {renderContent(artifact, openImageModal)}
               </div>
             )}
           </div>
         )
       })}
+      {imageModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 20
+          }}
+          onClick={() => setImageModal(null)}
+        >
+          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+            <button
+              onClick={() => setImageModal(null)}
+              style={{
+                position: 'absolute',
+                top: -10,
+                right: -10,
+                background: '#1e1e1e',
+                border: '1px solid #3a3a3a',
+                borderRadius: '50%',
+                width: 32,
+                height: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 1001
+              }}
+            >
+              <X size={16} color="#fff" />
+            </button>
+            <img
+              src={imageModal.content}
+              alt={imageModal.name || imageModal.id}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain',
+                borderRadius: 8,
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-function renderContent(artifact) {
+function renderContent(artifact, openImageModal) {
   switch (artifact.type) {
     case 'IMAGE':
       if (!artifact.content) return <div style={{ color: '#888', fontSize: 12 }}>No image data</div>
       return (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#111', borderRadius: 6, border: '1px solid #2f2f2f', minHeight: 80, maxHeight: 220, overflow: 'auto' }}>
           <img
-            src={`data:image/png;base64,${artifact.content}`}
+            src={artifact.content}
             alt={artifact.name || artifact.id}
-            style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 6, display: 'block' }}
+            style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 6, display: 'block', cursor: 'pointer' }}
+            onClick={() => openImageModal(artifact)}
+            title="Click to view full size"
           />
         </div>
       )
@@ -117,42 +187,5 @@ function truncateLines(text) {
   return slice.join('\n') + (lines.length > 12 ? '\n...' : '')
 }
 
-function downloadArtifact(artifact) {
-  try {
-    let blob
-    let filename = `${artifact.name || artifact.id}`
-    switch (artifact.type) {
-      case 'IMAGE': {
-        const byteChars = atob(artifact.content)
-        const byteNumbers = new Array(byteChars.length)
-        for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i)
-        const byteArray = new Uint8Array(byteNumbers)
-        blob = new Blob([byteArray], { type: 'image/png' })
-        filename += '.png'
-        break
-      }
-      case 'JSON_DATA': {
-        blob = new Blob([artifact.content], { type: 'application/json' })
-        filename += '.json'
-        break
-      }
-      case 'LOG':
-      default: {
-        blob = new Blob([artifact.content], { type: 'text/plain' })
-        filename += '.txt'
-        break
-      }
-    }
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
-  } catch {
-    // ignore
-  }
-}
+
 
