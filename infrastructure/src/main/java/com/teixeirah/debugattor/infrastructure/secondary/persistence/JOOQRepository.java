@@ -43,7 +43,8 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                 multiset(
                         select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.DESCRIPTION, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
                                 .from(ARTIFACTS)
-                                .where(ARTIFACTS.STEP_ID.eq(STEPS.ID)))
+                                .where(ARTIFACTS.STEP_ID.eq(STEPS.ID))
+                                .orderBy(ARTIFACTS.LOGGED_AT.asc()))
                         .convertFrom(rs -> rs.map(
                                 Records.mapping(Artifact::newArtifact)))
                         .as("artifacts");
@@ -57,7 +58,8 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                                 STEPS.REGISTERED_AT,
                                 STEPS.COMPLETED_AT)
                                 .from(STEPS)
-                                .where(STEPS.EXECUTION_ID.eq(EXECUTIONS.ID)))
+                                .where(STEPS.EXECUTION_ID.eq(EXECUTIONS.ID))
+                                .orderBy(STEPS.REGISTERED_AT.asc(), STEPS.ID.asc()))
                                 .as("steps")
                                 .convertFrom(rs -> rs.map(Records.mapping(Step::load)))
                 )
@@ -72,7 +74,8 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                 multiset(
                         select(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.DESCRIPTION, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
                                 .from(ARTIFACTS)
-                                .where(ARTIFACTS.STEP_ID.eq(STEPS.ID)))
+                                .where(ARTIFACTS.STEP_ID.eq(STEPS.ID))
+                                .orderBy(ARTIFACTS.LOGGED_AT.asc()))
                         .convertFrom(rs -> rs.map(
                                 Records.mapping(Artifact::newArtifact)))
                         .as("artifacts");
@@ -86,7 +89,8 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                                 STEPS.REGISTERED_AT,
                                 STEPS.COMPLETED_AT)
                                 .from(STEPS)
-                                .where(STEPS.EXECUTION_ID.eq(EXECUTIONS.ID)))
+                                .where(STEPS.EXECUTION_ID.eq(EXECUTIONS.ID))
+                                .orderBy(STEPS.REGISTERED_AT.asc(), STEPS.ID.asc()))
                                 .as("steps")
                                 .convertFrom(rs -> rs.map(Records.mapping(Step::load)))
                 )
@@ -121,6 +125,15 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
             }
             throw dae;
         }
+    }
+
+    @Override
+    public void setCompleted(UUID stepId) {
+        context.update(STEPS)
+                .set(STEPS.STATUS, Step.Status.COMPLETED.name())
+                .set(STEPS.COMPLETED_AT, currentOffsetDateTime())
+                .where(STEPS.ID.eq(stepId))
+                .execute();
     }
 
     @Override

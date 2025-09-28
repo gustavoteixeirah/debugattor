@@ -41,4 +41,9 @@ public class UseCasesConfiguration {
         return new DeleteExecutionUseCase(repository, artifactRepository, bucketStorage);
     }
 
+    @Bean
+    public CompleteStepUseCase completeStepUseCase(StepRepository repository) {
+        return new CompleteStepUseCase(repository);
+    }
+
 }

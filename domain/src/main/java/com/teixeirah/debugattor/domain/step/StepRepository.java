@@ -4,4 +4,6 @@ import java.util.UUID;
 
 public interface StepRepository {
     Step register(UUID executionId, Step step);
+    void setCompleted(UUID stepId);
+
 }

@@ -42,9 +42,11 @@ export function StepCard({ step, index }) {
       </div>
 
       <div style={{ borderTop: '1px solid #2a2a2a', paddingTop: 8, marginBottom: 8 }}>
-        <div style={{ fontSize: 12, color: '#aaa' }}>Started <TimeAgo date={start} /></div>
-        {end && <div style={{ fontSize: 12, color: '#aaa' }}>Ended <TimeAgo date={end} /></div>}
-        {durationMs != null && <div style={{ fontSize: 12, color: '#aaa' }}>Duration: {formatDuration(durationMs)}</div>}
+        {durationMs != null && (
+          <div style={{ fontSize: 12, color: '#aaa' }}>
+            Duration: {formatDuration(durationMs)} ({durationMs}ms)
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0, width: '100%' }}>

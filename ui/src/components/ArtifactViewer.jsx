@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Image, FileText, Code, Eye, EyeOff, X } from 'lucide-react'
+import { Image, FileText, Code, Eye, EyeOff, X, Maximize2, Copy } from 'lucide-react'
 
 export function ArtifactViewer({ artifacts }) {
   const [expanded, setExpanded] = useState(() => new Set(artifacts ? artifacts.map(a => a.id) : []))
   const [imageModal, setImageModal] = useState(null)
+  const [jsonModal, setJsonModal] = useState(null)
 
   const toggle = (id) => {
     const next = new Set(expanded)
@@ -16,18 +17,50 @@ export function ArtifactViewer({ artifacts }) {
     setImageModal(artifact)
   }
 
+  const openJsonModal = (artifact) => {
+    setJsonModal(artifact)
+  }
+
+  const copyJsonToClipboard = async (artifact, event) => {
+    if (event) {
+      event.stopPropagation()
+    }
+    try {
+      let textToCopy
+      if (artifact.type === 'JSON_DATA') {
+        try {
+          const parsed = JSON.parse(artifact.content)
+          textToCopy = JSON.stringify(parsed, null, 2)
+        } catch {
+          textToCopy = artifact.content
+        }
+      } else {
+        textToCopy = artifact.content
+      }
+      await navigator.clipboard.writeText(textToCopy)
+      // Feedback visual opcional - pode adicionar toast/notification aqui
+    } catch (err) {
+      // Fallback para browsers que não suportam clipboard API
+      console.error('Failed to copy:', err)
+    }
+  }
+
   useEffect(() => {
     const handleEscape = (event) => {
-      if (event.key === 'Escape' && imageModal) {
-        setImageModal(null)
+      if (event.key === 'Escape') {
+        if (imageModal) {
+          setImageModal(null)
+        } else if (jsonModal) {
+          setJsonModal(null)
+        }
       }
     }
 
-    if (imageModal) {
+    if (imageModal || jsonModal) {
       document.addEventListener('keydown', handleEscape)
       return () => document.removeEventListener('keydown', handleEscape)
     }
-  }, [imageModal])
+  }, [imageModal, jsonModal])
 
   const iconFor = (type) => {
     switch (type) {
@@ -72,11 +105,21 @@ export function ArtifactViewer({ artifacts }) {
                 <button onClick={() => toggle(artifact.id)} title={isExpanded ? 'Hide' : 'Show'} style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
                   {isExpanded ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
+                {artifact.type === 'JSON_DATA' && (
+                  <>
+                    <button onClick={(e) => copyJsonToClipboard(artifact, e)} title="Copy JSON" style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
+                      <Copy size={14} />
+                    </button>
+                    <button onClick={() => openJsonModal(artifact)} title="View Full JSON" style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
+                      <Maximize2 size={14} />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             {isExpanded && (
               <div style={{ padding: '0 10px 10px 10px' }}>
-                {renderContent(artifact, openImageModal)}
+                {renderContent(artifact, openImageModal, openJsonModal, copyJsonToClipboard)}
               </div>
             )}
           </div>
@@ -146,11 +189,137 @@ export function ArtifactViewer({ artifacts }) {
           </div>
         </div>
       )}
+      {jsonModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 40
+          }}
+          onClick={() => setJsonModal(null)}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              width: '90%', 
+              height: '90%',
+              background: '#1e1e1e',
+              border: '1px solid #3a3a3a',
+              borderRadius: 12,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px 20px',
+              borderBottom: '1px solid #3a3a3a',
+              background: '#2a2a2a'
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>
+                {jsonModal.description || jsonModal.id} - JSON Data
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  onClick={() => copyJsonToClipboard(jsonModal)}
+                  title="Copy JSON"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #3a3a3a',
+                    borderRadius: 6,
+                    padding: 8,
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Copy size={16} />
+                </button>
+                <button
+                  onClick={() => setJsonModal(null)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #3a3a3a',
+                    borderRadius: 6,
+                    padding: 8,
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: 20
+            }}>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => copyJsonToClipboard(jsonModal)}
+                  title="Copy JSON"
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    background: 'rgba(30, 30, 30, 0.9)',
+                    border: '1px solid #3a3a3a',
+                    borderRadius: 6,
+                    padding: 6,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    zIndex: 1,
+                    backdropFilter: 'blur(4px)'
+                  }}
+                >
+                  <Copy size={14} />
+                </button>
+                <pre style={{
+                  background: '#141414',
+                  color: '#ddd',
+                  padding: 16,
+                  borderRadius: 8,
+                  fontSize: 14,
+                  lineHeight: 1.4,
+                  overflow: 'auto',
+                  margin: 0,
+                  border: '1px solid #2f2f2f',
+                  fontFamily: 'Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
+                }}>
+                {(() => {
+                  try {
+                    const parsed = JSON.parse(jsonModal.content)
+                    return JSON.stringify(parsed, null, 2)
+                  } catch {
+                    return jsonModal.content
+                  }
+                })()}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-function renderContent(artifact, openImageModal) {
+function renderContent(artifact, openImageModal, openJsonModal, copyJsonToClipboard) {
   switch (artifact.type) {
     case 'IMAGE':
       if (!artifact.content) return <div style={{ color: '#888', fontSize: 12 }}>No image data</div>

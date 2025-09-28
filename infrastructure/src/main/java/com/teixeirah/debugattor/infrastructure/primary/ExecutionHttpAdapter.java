@@ -26,6 +26,7 @@ class ExecutionHttpAdapter {
     private final RegisterStepUseCase registerStepUseCase;
     private final LogArtifactUseCase logArtifactUseCase;
     private final DeleteExecutionUseCase deleteExecutionUseCase;
+    private final CompleteStepUseCase completeStepUseCase;
 
     @PostMapping
     ResponseEntity<Execution> startExecution() {
@@ -84,6 +85,12 @@ class ExecutionHttpAdapter {
         } catch (ExecutionNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/{executionId}/steps/{stepId}/complete")
+    ResponseEntity<Void> completeStep(@PathVariable UUID executionId, @PathVariable UUID stepId) {
+        completeStepUseCase.execute(stepId);
+        return ResponseEntity.noContent().build();
     }
 
     public record LogArtifact(String type, String description, String content, MultipartFile file) {
