@@ -1,4 +1,3 @@
-version: "3"
 services:
   db:
     image: postgres:16
@@ -19,6 +18,38 @@ services:
     ports:
       - "5432:5432"
 
+  minio:
+    image: quay.io/minio/minio
+    restart: no
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  minio-setup:
+    image: minio/mc
+    restart: "no"
+    depends_on:
+      - minio
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - >-
+        set -e; echo "Waiting for MinIO to be ready..."; 
+        until (/usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin) >/dev/null 2>&1; do 
+          sleep 2; 
+        done; 
+        echo "Creating bucket 'artifacts' if not exists..."; 
+        /usr/bin/mc mb -p local/artifacts || true; 
+        echo "Setting anonymous download policy on 'artifacts'..."; 
+        /usr/bin/mc anonymous set download local/artifacts; 
+        echo "MinIO setup complete."
+
 volumes:
   postgres:
   postgres_data:
+  minio_data:
