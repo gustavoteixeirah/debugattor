@@ -94,13 +94,25 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
     }
 
     @Override
-    public void register(UUID executionId, Step step) {
+    public Step register(UUID executionId, Step step) {
         try {
-            context.insertInto(STEPS)
+            var record = context.insertInto(STEPS)
                     .set(STEPS.EXECUTION_ID, executionId)
                     .set(STEPS.NAME, step.name())
                     .set(STEPS.STATUS, step.status().name())
-                    .execute();
+                    .returningResult(asterisk())
+                    .fetchOne();
+            if (record == null) {
+                throw new DataAccessException("Failed to insert Step");
+            }
+            return Step.load(
+                record.get(STEPS.ID),
+                record.get(STEPS.NAME),
+                record.get(STEPS.STATUS),
+                List.of(), // no artifacts at registration
+                record.get(STEPS.REGISTERED_AT),
+                record.get(STEPS.COMPLETED_AT)
+            );
         } catch (DataAccessException dae) {
             if (isForeignKeyViolation(dae)) {
                 throw new ExecutionNotFoundException(executionId);

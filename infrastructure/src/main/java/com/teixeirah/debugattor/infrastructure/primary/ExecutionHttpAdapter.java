@@ -4,6 +4,7 @@ import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.Artifact;
 import com.teixeirah.debugattor.domain.artifact.FileMetadata;
 import com.teixeirah.debugattor.domain.execution.Execution;
+import com.teixeirah.debugattor.domain.step.Step;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,9 @@ class ExecutionHttpAdapter {
     }
 
     @PostMapping("/{executionId}/steps")
-    ResponseEntity<Execution> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto dto) {
-        registerStepUseCase.execute(executionId, dto.name());
-        return getExecutionById(executionId);
+    ResponseEntity<Step> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto dto) {
+        final var step = registerStepUseCase.execute(executionId, dto.name());
+        return ResponseEntity.ok(step);
     }
 
     public record RegisterStepDto(String name) {

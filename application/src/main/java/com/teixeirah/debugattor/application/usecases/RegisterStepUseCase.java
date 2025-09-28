@@ -1,5 +1,6 @@
 package com.teixeirah.debugattor.application.usecases;
 
+import com.teixeirah.debugattor.domain.step.Step;
 import com.teixeirah.debugattor.domain.step.StepRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -12,9 +13,9 @@ public class RegisterStepUseCase {
 
     private final StepRepository repository;
 
-    public void execute(UUID id, String name) {
+    public Step execute(UUID id, String name) {
 
-        repository.register(id, newStep(name));
+        return repository.register(id, newStep(name));
     }
 
 }
