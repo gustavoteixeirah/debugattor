@@ -20,8 +20,17 @@ public class LogArtifactUseCase {
     }
 
     public Artifact logFile(UUID stepId, Artifact.Type type, String description, InputStream file, FileMetadata metadata) {
-        final var url = bucketStorageOutputPort.storeFile(file, metadata.originalFilename(), metadata.contentType(), metadata.size());
-        return artifactRepository.log(stepId, type, description, url);
+        var artifact = artifactRepository.createWithoutUrl(stepId, type, description);
+        final var url = bucketStorageOutputPort.storeFile(file, artifact.id().toString(), metadata.contentType(), metadata.size());
+        artifactRepository.updateContent(artifact.id(), url);
+
+        return new Artifact(
+                artifact.id(),
+                artifact.type(),
+                artifact.description(),
+                url,
+                artifact.loggedAt()
+        );
     }
 
 }

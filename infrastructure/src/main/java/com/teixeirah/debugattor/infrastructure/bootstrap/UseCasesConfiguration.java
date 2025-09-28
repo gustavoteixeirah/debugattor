@@ -32,8 +32,13 @@ public class UseCasesConfiguration {
     }
 
     @Bean
-    public LogArtifactUseCase logArtifactUseCase(BucketStorageOutputPort bucketStorage, ArtifactRepository repository) {
+    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository, BucketStorageOutputPort bucketStorage) {
         return new LogArtifactUseCase(repository, bucketStorage);
+    }
+
+    @Bean
+    public DeleteExecutionUseCase deleteExecutionUseCase(ExecutionRepository repository, ArtifactRepository artifactRepository, BucketStorageOutputPort bucketStorage) {
+        return new DeleteExecutionUseCase(repository, artifactRepository, bucketStorage);
     }
 
 }

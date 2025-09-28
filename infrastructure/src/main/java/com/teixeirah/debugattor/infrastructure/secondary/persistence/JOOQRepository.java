@@ -9,6 +9,7 @@ import com.teixeirah.debugattor.domain.step.Step;
 import com.teixeirah.debugattor.domain.step.StepNotFoundException;
 import com.teixeirah.debugattor.domain.step.StepRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Records;
@@ -137,6 +138,65 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
             }
             throw dae;
         }
+    }
+
+    @Override
+    public Artifact createWithoutUrl(UUID stepId, Artifact.Type type, String description) {
+        var record = context.insertInto(ARTIFACTS)
+                .set(ARTIFACTS.STEP_ID, stepId)
+                .set(ARTIFACTS.TYPE, type.name())
+                .set(ARTIFACTS.DESCRIPTION, description)
+                .set(ARTIFACTS.CONTENT, Strings.EMPTY)
+                .returningResult(ARTIFACTS.ID, ARTIFACTS.TYPE, ARTIFACTS.DESCRIPTION, ARTIFACTS.CONTENT, ARTIFACTS.LOGGED_AT)
+                .fetchOne();
+        return Artifact.newArtifact(
+                record.get(ARTIFACTS.ID),
+                record.get(ARTIFACTS.TYPE),
+                record.get(ARTIFACTS.DESCRIPTION),
+                record.get(ARTIFACTS.CONTENT),
+                record.get(ARTIFACTS.LOGGED_AT)
+        );
+    }
+
+    @Override
+    public void updateContent(UUID artifactId, String url) {
+        context.update(ARTIFACTS)
+                .set(ARTIFACTS.CONTENT, url)
+                .where(ARTIFACTS.ID.eq(artifactId))
+                .execute();
+    }
+
+    @Override
+    public boolean deleteById(UUID executionId) {
+        var steps = context.select(STEPS.ID)
+                .from(STEPS)
+                .where(STEPS.EXECUTION_ID.eq(executionId))
+                .fetch(STEPS.ID);
+
+        if (steps.isEmpty()) {
+            var exists = context.fetchExists(EXECUTIONS, EXECUTIONS.ID.eq(executionId));
+            if (!exists) return false;
+        }
+
+        context.deleteFrom(ARTIFACTS)
+                .where(ARTIFACTS.STEP_ID.in(steps))
+                .execute();
+        context.deleteFrom(STEPS)
+                .where(STEPS.EXECUTION_ID.eq(executionId))
+                .execute();
+        int deleted = context.deleteFrom(EXECUTIONS)
+                .where(EXECUTIONS.ID.eq(executionId))
+                .execute();
+        return deleted > 0;
+    }
+
+    @Override
+    public List<String> findImagesByExecutionId(UUID executionId) {
+        return context.select(ARTIFACTS.CONTENT)
+                .from(ARTIFACTS)
+                .join(STEPS).on(ARTIFACTS.STEP_ID.eq(STEPS.ID))
+                .where(STEPS.EXECUTION_ID.eq(executionId).and(ARTIFACTS.TYPE.eq("IMAGE")))
+                .fetch(r -> r.get(ARTIFACTS.CONTENT));
     }
 
     private static boolean isForeignKeyViolation(Throwable t) {

@@ -95,30 +95,38 @@ export function ArtifactViewer({ artifacts }) {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: 20
+            padding: 40
           }}
           onClick={() => setImageModal(null)}
         >
-          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+          <div style={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
             <button
               onClick={() => setImageModal(null)}
               style={{
                 position: 'absolute',
-                top: -10,
-                right: -10,
-                background: '#1e1e1e',
+                top: 10,
+                right: 10,
+                background: 'rgba(30, 30, 30, 0.9)',
                 border: '1px solid #3a3a3a',
                 borderRadius: '50%',
-                width: 32,
-                height: 32,
+                width: 40,
+                height: 40,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                zIndex: 1001
+                zIndex: 1001,
+                backdropFilter: 'blur(4px)'
               }}
             >
-              <X size={16} color="#fff" />
+              <X size={20} color="#fff" />
             </button>
             <img
               src={imageModal.content}
@@ -126,9 +134,12 @@ export function ArtifactViewer({ artifacts }) {
               style={{
                 maxWidth: '100%',
                 maxHeight: '100%',
+                width: 'auto',
+                height: 'auto',
                 objectFit: 'contain',
                 borderRadius: 8,
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
+                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.6)',
+                display: 'block'
               }}
               onClick={(e) => e.stopPropagation()}
             />

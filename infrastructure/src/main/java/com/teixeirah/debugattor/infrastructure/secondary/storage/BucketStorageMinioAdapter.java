@@ -8,12 +8,14 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 class BucketStorageMinioAdapter implements BucketStorageOutputPort {
@@ -28,6 +30,7 @@ class BucketStorageMinioAdapter implements BucketStorageOutputPort {
 
     @Override
     public String storeFile(InputStream fileStream, String objectName, String contentType, long fileSize) {
+        log.info("Storing file {} to bucket {}", objectName, bucketName);
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -63,6 +66,7 @@ class BucketStorageMinioAdapter implements BucketStorageOutputPort {
 
     @Override
     public void deleteFile(String objectName) {
+        log.info("Deleting file {} from bucket {}", objectName, bucketName);
         try {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()

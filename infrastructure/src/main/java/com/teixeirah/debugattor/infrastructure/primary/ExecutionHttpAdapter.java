@@ -4,6 +4,7 @@ import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.Artifact;
 import com.teixeirah.debugattor.domain.artifact.FileMetadata;
 import com.teixeirah.debugattor.domain.execution.Execution;
+import com.teixeirah.debugattor.domain.execution.ExecutionNotFoundException;
 import com.teixeirah.debugattor.domain.step.Step;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ class ExecutionHttpAdapter {
     private final GetExecutionByIdUseCase getExecutionByIdUseCase;
     private final RegisterStepUseCase registerStepUseCase;
     private final LogArtifactUseCase logArtifactUseCase;
+    private final DeleteExecutionUseCase deleteExecutionUseCase;
 
     @PostMapping
     ResponseEntity<Execution> startExecution() {
@@ -72,6 +74,16 @@ class ExecutionHttpAdapter {
                 metadata);
 
         return ResponseEntity.ok(artifact);
+    }
+
+    @DeleteMapping("/{executionId}")
+    ResponseEntity<Void> deleteExecution(@PathVariable UUID executionId) {
+        try {
+            deleteExecutionUseCase.delete(executionId);
+            return ResponseEntity.noContent().build();
+        } catch (ExecutionNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     public record LogArtifact(String type, String description, String content, MultipartFile file) {

@@ -1,4 +1,3 @@
-
 package com.teixeirah.debugattor.domain.execution;
 
 import java.util.List;
@@ -11,4 +10,6 @@ public interface ExecutionRepository {
     List<Execution> findAll();
 
     Optional<Execution> findById(UUID id);
+
+    boolean deleteById(UUID id);
 }
