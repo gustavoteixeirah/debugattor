@@ -4,6 +4,9 @@
 
 A **lightweight** experiment execution tracker for ML/AI/Computer Vision projects. Start an **execution**, record its **steps**, and **log artifacts** (logs, images, JSON) for each step. At the end you get a complete, queryable **timeline** of the experiment.
 
+![img.png](img.png)
+
+
 - Multi-module Gradle project
 - Hexagonal architecture with clear separation of concerns
 - Spring Boot 3 (REST), PostgreSQL, Flyway, jOOQ (type-safe SQL)

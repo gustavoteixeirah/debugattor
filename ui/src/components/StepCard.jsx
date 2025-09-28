@@ -1,6 +1,7 @@
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { ArtifactViewer } from './ArtifactViewer'
 import { formatDateTime, formatDuration } from '@/lib/time-utils'
+import { TimeAgo } from './TimeAgo'
 
 export function StepCard({ step, index }) {
   const icon = (() => {
@@ -41,14 +42,16 @@ export function StepCard({ step, index }) {
       </div>
 
       <div style={{ borderTop: '1px solid #2a2a2a', paddingTop: 8, marginBottom: 8 }}>
-        <div style={{ fontSize: 12, color: '#aaa' }}>Started: {formatDateTime(start)}</div>
-        {end && <div style={{ fontSize: 12, color: '#aaa' }}>Ended: {formatDateTime(end)}</div>}
+        <div style={{ fontSize: 12, color: '#aaa' }}>Started <TimeAgo date={start} /></div>
+        {end && <div style={{ fontSize: 12, color: '#aaa' }}>Ended <TimeAgo date={end} /></div>}
         {durationMs != null && <div style={{ fontSize: 12, color: '#aaa' }}>Duration: {formatDuration(durationMs)}</div>}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0, width: '100%' }}>
         <div style={{ fontWeight: 600, fontSize: 13, color: '#eee' }}>Artifacts</div>
-        <ArtifactViewer artifacts={step.artifacts || []} />
+        <div style={{ minWidth: 0, width: '100%', overflow: 'hidden' }}>
+          <ArtifactViewer artifacts={step.artifacts || []} />
+        </div>
       </div>
     </div>
   )

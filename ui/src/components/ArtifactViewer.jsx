@@ -52,12 +52,12 @@ export function ArtifactViewer({ artifacts }) {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 8, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', minWidth: 0 }}>
       {artifacts.map((artifact) => {
         const isExpanded = expanded.has(artifact.id)
         const name = artifact.description || artifact.id
         return (
-          <div key={artifact.id} style={{ border: '1px solid #2f2f2f', borderRadius: 8, background: '#1e1e1e' }}>
+          <div key={artifact.id} style={{ border: '1px solid #2f2f2f', borderRadius: 8, background: '#1e1e1e', minWidth: 0, width: '100%', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
                 <div style={{ padding: 4, border: '1px solid #3a3a3a', borderRadius: 6 }}>{iconFor(artifact.type)}</div>

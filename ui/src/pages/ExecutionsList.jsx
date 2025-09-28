@@ -3,6 +3,7 @@ import { fetchExecutions } from '@/api/executions'
 import { formatDateTime } from '@/lib/time-utils'
 import { useNavigate } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
+import { TimeAgo } from '@/components/TimeAgo'
 
 export default function ExecutionsList() {
   const [executions, setExecutions] = useState([])
@@ -105,8 +106,8 @@ export default function ExecutionsList() {
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 13, color: '#aaa' }}>
-                  <span>Started: {formatDateTime(e.startedAt)}</span>
-                  <span>Finished: {e.finishedAt ? formatDateTime(e.finishedAt) : '-'}</span>
+                  <span>Started <TimeAgo date={e.startedAt} /></span>
+                  <span>Finished {e.finishedAt ? <TimeAgo date={e.finishedAt} /> : '-'}</span>
                 </div>
               </button>
             ))}

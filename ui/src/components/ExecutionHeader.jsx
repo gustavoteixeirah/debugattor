@@ -1,4 +1,5 @@
 import { formatDateTime } from '@/lib/time-utils'
+import { TimeAgo } from './TimeAgo'
 
 export function ExecutionHeader({ execution }) {
   const started = execution.startedAt
@@ -15,8 +16,8 @@ export function ExecutionHeader({ execution }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Execution {shortId(execution.id)}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#aaa', fontSize: 13 }}>
-          <span>Started: {formatDateTime(started)}</span>
-          <span>Finished: {finished ? formatDateTime(finished) : '-'}</span>
+          <span>Started <TimeAgo date={started} /></span>
+          <span>Finished {finished ? <TimeAgo date={finished} /> : '-'}</span>
           <span>Steps: {steps.length}</span>
           <span>✓ {counts.COMPLETED} • ▶ {counts.RUNNING} • ✕ {counts.FAILED}</span>
         </div>

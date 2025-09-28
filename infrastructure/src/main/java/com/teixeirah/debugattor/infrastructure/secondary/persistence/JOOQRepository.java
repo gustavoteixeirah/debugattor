@@ -62,6 +62,7 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                                 .convertFrom(rs -> rs.map(Records.mapping(Step::load)))
                 )
                 .from(EXECUTIONS)
+                .orderBy(EXECUTIONS.STARTED_AT.desc())
                 .fetchInto(Execution.class);
     }
 
