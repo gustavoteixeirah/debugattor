@@ -1,6 +1,5 @@
-# Debugattor
+![logo.png](logo.png)
 
-[![Build](https://github.com/gustavoteixeirah/debugattor/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/gustavoteixeirah/debugattor/actions/workflows/gradle.yml)
 
 A **lightweight** experiment execution tracker for ML/AI/Computer Vision projects. Start an **execution**, record its **steps**, and **log artifacts** (logs, images, JSON) for each step. At the end you get a complete, queryable **timeline** of the experiment.
 
