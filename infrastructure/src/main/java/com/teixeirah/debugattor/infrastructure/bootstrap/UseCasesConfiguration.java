@@ -3,6 +3,7 @@ package com.teixeirah.debugattor.infrastructure.bootstrap;
 import com.teixeirah.debugattor.application.output.BucketStorageOutputPort;
 import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.ArtifactRepository;
+import com.teixeirah.debugattor.domain.events.EventPublisher;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
 import com.teixeirah.debugattor.domain.step.StepRepository;
 import org.springframework.context.annotation.Bean;
@@ -27,13 +28,13 @@ public class UseCasesConfiguration {
     }
 
     @Bean
-    public RegisterStepUseCase registerStepUseCase(StepRepository repository) {
-        return new RegisterStepUseCase(repository);
+    public RegisterStepUseCase registerStepUseCase(StepRepository repository,  EventPublisher eventPublisher) {
+        return new RegisterStepUseCase(repository, eventPublisher);
     }
 
     @Bean
-    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository, BucketStorageOutputPort bucketStorage) {
-        return new LogArtifactUseCase(repository, bucketStorage);
+    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository, BucketStorageOutputPort bucketStorage,  EventPublisher eventPublisher) {
+        return new LogArtifactUseCase(repository, bucketStorage, eventPublisher);
     }
 
     @Bean

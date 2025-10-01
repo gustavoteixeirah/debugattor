@@ -2,9 +2,26 @@ import { useState, useEffect } from 'react'
 import { Image, FileText, Code, Eye, EyeOff, X, Maximize2, Copy } from 'lucide-react'
 
 export function ArtifactViewer({ artifacts }) {
-  const [expanded, setExpanded] = useState(() => new Set(artifacts ? artifacts.map(a => a.id) : []))
+  const stableKey = (a) => a?.id || a?.artifactId || a?.url || `${a?.stepId || ''}:${a?.description || ''}:${a?.loggedAt || ''}`
+
+  // Default expand ALL artifacts present at first render
+  const [expanded, setExpanded] = useState(() => new Set(artifacts ? artifacts.map(a => stableKey(a)) : []))
   const [imageModal, setImageModal] = useState(null)
   const [jsonModal, setJsonModal] = useState(null)
+
+  // When artifacts update (e.g., via SSE), auto-expand any new artifacts
+  useEffect(() => {
+    if (!artifacts) return
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      let changed = false
+      for (const a of artifacts) {
+        const k = stableKey(a)
+        if (!next.has(k)) { next.add(k); changed = true }
+      }
+      return changed ? next : prev
+    })
+  }, [artifacts])
 
   const toggle = (id) => {
     const next = new Set(expanded)
@@ -38,9 +55,7 @@ export function ArtifactViewer({ artifacts }) {
         textToCopy = artifact.content
       }
       await navigator.clipboard.writeText(textToCopy)
-      // Feedback visual opcional - pode adicionar toast/notification aqui
     } catch (err) {
-      // Fallback para browsers que não suportam clipboard API
       console.error('Failed to copy:', err)
     }
   }
@@ -86,11 +101,13 @@ export function ArtifactViewer({ artifacts }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', minWidth: 0 }}>
-      {artifacts.map((artifact) => {
-        const isExpanded = expanded.has(artifact.id)
+      {artifacts.map((artifact, index) => {
+        const aid = stableKey(artifact)
+        const isExpanded = expanded.has(aid)
         const name = artifact.description || artifact.id
+        const key = aid || String(index)
         return (
-          <div key={artifact.id} style={{ border: '1px solid #2f2f2f', borderRadius: 8, background: '#1e1e1e', minWidth: 0, width: '100%', boxSizing: 'border-box' }}>
+          <div key={key} style={{ border: '1px solid #2f2f2f', borderRadius: 8, background: '#1e1e1e', minWidth: 0, width: '100%', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
                 <div style={{ padding: 4, border: '1px solid #3a3a3a', borderRadius: 6 }}>{iconFor(artifact.type)}</div>
@@ -102,7 +119,7 @@ export function ArtifactViewer({ artifacts }) {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <button onClick={() => toggle(artifact.id)} title={isExpanded ? 'Hide' : 'Show'} style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
+                <button onClick={() => toggle(aid)} title={isExpanded ? 'Hide' : 'Show'} style={{ background: 'transparent', border: '1px solid #3a3a3a', borderRadius: 6, padding: 4 }}>
                   {isExpanded ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
                 {artifact.type === 'JSON_DATA' && (
@@ -366,6 +383,3 @@ function truncateLines(text) {
   const slice = lines.slice(0, 12)
   return slice.join('\n') + (lines.length > 12 ? '\n...' : '')
 }
-
-
-

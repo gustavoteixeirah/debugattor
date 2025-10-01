@@ -46,7 +46,7 @@ export function ExecutionSteps({ execution, onBack }) {
         >
           {steps.map((step, index) => (
             <div
-              key={step.id}
+              key={step.id || `${step.name || 'step'}:${index}`}
               style={{
                 flex: '0 0 320px',
                 minWidth: 320,
@@ -62,4 +62,3 @@ export function ExecutionSteps({ execution, onBack }) {
     </div>
   )
 }
-

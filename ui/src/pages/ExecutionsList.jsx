@@ -81,13 +81,17 @@ export default function ExecutionsList() {
         ) : (
           <div style={{ display: 'grid', gap: 10 }}>
             {executions.map((e) => (
-              <button key={e.id} onClick={() => navigate(`/executions/${e.id}`)} style={{ textAlign: 'left', border: '1px solid #2f2f2f', background: '#1e1e1e', borderRadius: 10, padding: 12, color: '#ddd' }}>
+              <div
+                key={e.id}
+                onClick={() => navigate(`/executions/${e.id}`)}
+                style={{ cursor: 'pointer', textAlign: 'left', border: '1px solid #2f2f2f', background: '#1e1e1e', borderRadius: 10, padding: 12, color: '#ddd' }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 700, color: '#fff' }}>Execution {String(e.id).slice(0, 8)}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontSize: 12, color: '#aaa' }}>Steps: {(e.steps || []).length}</div>
                     <button
-                      onClick={(event) => openDeleteModal(e.id, event)}
+                      onClick={(event) => { event.stopPropagation(); openDeleteModal(e.id, event); }}
                       style={{
                         background: 'transparent',
                         border: '1px solid #3a3a3a',
@@ -109,7 +113,7 @@ export default function ExecutionsList() {
                   <span>Started <TimeAgo date={e.startedAt} /></span>
                   <span>Finished {e.finishedAt ? <TimeAgo date={e.finishedAt} /> : '-'}</span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}
@@ -187,4 +191,3 @@ export default function ExecutionsList() {
     </div>
   )
 }
-
