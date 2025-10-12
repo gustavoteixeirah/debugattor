@@ -110,7 +110,7 @@ Base path: /api
 - POST /api/executions/{executionId}/steps
   - Body: { "name": "string" }
   - Registers a new step for an execution
-  - Response 200: updated Execution
+  - Response 200: Step
 - POST /api/executions/{executionId}/steps/{stepId}/artifacts
   - Body: { "type": "LOG|IMAGE|JSON_DATA", "content": "string" }
   - Logs an artifact for a step

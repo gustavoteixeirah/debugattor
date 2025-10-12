@@ -69,11 +69,11 @@ paths:
               $ref: '#/components/schemas/RegisterStepRequest'
       responses:
         '200':
-          description: Updated execution with the new step
+          description: Created step
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Execution'
+                $ref: '#/components/schemas/Step'
         '404':
           description: Execution not found
   /api/executions/{executionId}/steps/{stepId}/artifacts:
@@ -186,4 +186,3 @@ components:
         content:
           type: string
       required: [type, content]
-

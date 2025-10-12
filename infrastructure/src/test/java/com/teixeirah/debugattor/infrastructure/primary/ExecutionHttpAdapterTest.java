@@ -101,7 +101,9 @@ class ExecutionHttpAdapterTest {
                 .then()
                 .statusCode(allOf(greaterThanOrEqualTo(200), lessThan(300)))
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(id));
+                .body("id", notNullValue())
+                .body("name", equalTo("compile"))
+                .body("status", equalTo("RUNNING"));
     }
 
     @Test
