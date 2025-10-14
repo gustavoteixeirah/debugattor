@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "name": "Debugattor",
+  "type": "collection",
+  "ignore": [
+    ".git"
+  ]
+}

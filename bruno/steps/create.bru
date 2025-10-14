@@ -1,0 +1,21 @@
+meta {
+  name: create step
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/api/executions/:execution_id/steps
+  body: json
+  auth: none
+}
+
+params:path {
+  execution_id: 5a7b46eb-471d-439e-9361-12b9f6a0210c
+}
+
+body:json {
+  {
+    "name": "Testing"
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: delete execution
+  type: http
+  seq: 8
+}
+
+delete {
+  url: http://localhost:8080/api/executions/:execution_id
+  body: none
+  auth: none
+}
+
+params:path {
+  execution_id: 0d3c0c0f-24f4-447f-9ec5-6a333f683238
+}

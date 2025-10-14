@@ -1,0 +1,16 @@
+meta {
+  name: complete step
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8080/api/executions/:execution_id/steps/:step_id/complete
+  body: none
+  auth: none
+}
+
+params:path {
+  execution_id: 
+  step_id: 
+}

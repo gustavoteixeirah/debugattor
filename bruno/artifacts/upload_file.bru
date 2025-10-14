@@ -1,0 +1,22 @@
+meta {
+  name: log image artifact
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:8080/api/executions/:execution_id/steps/:step_id/artifacts/upload
+  body: multipartForm
+  auth: none
+}
+
+params:path {
+  step_id: 3f58cdce-ba1f-43d9-8d89-37d12bd4f343
+  execution_id: 5a7b46eb-471d-439e-9361-12b9f6a0210c
+}
+
+body:multipart-form {
+  type: IMAGE
+  description: logo
+  file: @file(/home/teixeira/code/debugattor/logo.png)
+}

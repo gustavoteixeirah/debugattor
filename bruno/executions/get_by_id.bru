@@ -1,0 +1,15 @@
+meta {
+  name: get execution by id
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:8080/api/executions/:execution_id
+  body: none
+  auth: none
+}
+
+params:path {
+  execution_id: 5a7b46eb-471d-439e-9361-12b9f6a0210c
+}
