@@ -5,7 +5,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}/${DB_NAME:debugattor}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:debugattor}
     username: ${DB_USERNAME:debugattor}
     password: ${DB_PASSWORD:debugattor}
     driver-class-name: org.postgresql.Driver
@@ -27,4 +27,3 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucket: artifacts
-

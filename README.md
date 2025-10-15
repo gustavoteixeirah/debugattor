@@ -47,16 +47,7 @@ These pieces form a timeline you can browse and query, from high‑level progres
 
 ---
 
-## What you can do with it
-
-- Keep a clean record of your experiments without changing your stack
-- Share a link and let teammates explore your timeline
-- Compare runs and see exactly what changed
-- Capture results right where they are produced
-
----
-
-## Architecture (birds‑eye view)
+## Architecture (bird’s‑eye view)
 
 Debugattor is designed to be small, understandable, and replaceable by parts when needed.
 
@@ -74,6 +65,33 @@ Debugattor is designed to be small, understandable, and replaceable by parts whe
 
 This separation keeps the domain clean and makes the system easy to evolve.
 
+---
+
+## Run locally (for development)
+
+- Start infrastructure (Postgres + MinIO) with Docker Compose:
+
+```bash
+cd scripts
+docker compose -f compose.yaml up -d
+```
+
+- Backend API (port 8080 by default):
+
+```bash
+cd backend
+gradle :infrastructure:bootRun
+```
+
+- Web UI (Vite dev server on port 5173 by default):
+
+```bash
+cd ui
+npm install
+npm run dev
+```
+
+---
 
 ## Who is this for?
 
@@ -86,13 +104,13 @@ This separation keeps the domain clean and makes the system easy to evolve.
 
 Debugattor is a focused, evolving project. Planned directions:
 
-- Step lifecycle endpoints (complete/fail step, finish execution)
 - Labels on executions for better filtering
-- Filtering and search on execution lists
+- Authentication (login/session or tokens)
 - Projects: optional scoping of executions by project
 - Export timeline as a formatted PDF report
+- Step lifecycle endpoints (complete/fail step, finish execution)
+- Filtering and search on execution lists
 - Artifact storage backends (e.g., S3/GCS for large blobs)
-- Authentication (login/session or tokens)
 - Authorization for multi‑user teams
 - Observability: metrics and structured logs
 
