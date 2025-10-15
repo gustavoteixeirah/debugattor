@@ -67,6 +67,39 @@ This separation keeps the domain clean and makes the system easy to evolve.
 
 ---
 
+## Run with Docker (usage)
+
+If you just want to run Debugattor locally without installing Java/Node/Gradle, you only need Docker. Everything builds inside containers.
+
+- Requirements: Docker (and Docker Compose)
+
+Steps:
+
+```bash
+# from the repo root
+cd scripts
+# build and start everything in the background
+docker compose -f compose-app.yaml up -d --build
+```
+
+Then visit:
+
+- Web UI: http://localhost:3000
+- API root: http://localhost:8080/api
+- MinIO Console: http://localhost:9001 (user: minioadmin / pass: minioadmin)
+
+Notes:
+
+- The backend reads DB and MinIO settings from environment variables provided by the compose file.
+- Images are stored in MinIO in the `artifacts` bucket; anonymous download is enabled so the UI can render previews.
+- Stop everything with:
+
+```bash
+docker compose -f compose-app.yaml down
+```
+
+---
+
 ## Run locally (for development)
 
 - Start infrastructure (Postgres + MinIO) with Docker Compose:

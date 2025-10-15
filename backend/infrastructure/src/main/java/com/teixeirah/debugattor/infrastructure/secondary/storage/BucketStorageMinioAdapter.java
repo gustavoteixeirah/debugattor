@@ -28,6 +28,9 @@ class BucketStorageMinioAdapter implements BucketStorageOutputPort {
     @Value("${minio.url}")
     private String minioUrl;
 
+    @Value("${minio.publicUrl:${minio.url}}")
+    private String publicUrl;
+
     @Override
     public String storeFile(InputStream fileStream, String objectName, String contentType, long fileSize) {
         log.info("Storing file {} to bucket {}", objectName, bucketName);
@@ -40,7 +43,8 @@ class BucketStorageMinioAdapter implements BucketStorageOutputPort {
                             .contentType(contentType)
                             .build()
             );
-            return String.format("%s/%s/%s", minioUrl, bucketName, objectName);
+            // Return a browser-accessible URL using publicUrl
+            return String.format("%s/%s/%s", publicUrl, bucketName, objectName);
         } catch (Exception e) {
             throw new RuntimeException("Falha ao fazer upload do arquivo para o MinIO: " + e.getMessage());
         }

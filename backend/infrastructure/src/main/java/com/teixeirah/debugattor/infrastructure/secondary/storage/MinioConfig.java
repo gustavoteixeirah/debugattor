@@ -10,10 +10,10 @@ class MinioConfig {
     @Value("${minio.url}")
     private String minioUrl;
 
-    @Value("${minio.accessKey}")
+    @Value("${minio.access-key:${minio.accessKey}}")
     private String accessKey;
 
-    @Value("${minio.secretKey}")
+    @Value("${minio.secret-key:${minio.secretKey}}")
     private String secretKey;
 
     @Bean
