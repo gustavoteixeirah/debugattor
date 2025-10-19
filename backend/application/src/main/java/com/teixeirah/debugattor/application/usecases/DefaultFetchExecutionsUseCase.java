@@ -1,15 +1,19 @@
 package com.teixeirah.debugattor.application.usecases;
 
+import com.teixeirah.debugattor.application.input.FetchExecutionsUseCase;
 import com.teixeirah.debugattor.domain.execution.Execution;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
-public class StartExecutionUseCase {
+public class DefaultFetchExecutionsUseCase implements FetchExecutionsUseCase {
 
     private final ExecutionRepository repository;
 
-    public Execution execute() {
-        return repository.create();
+    @Override
+    public List<Execution> execute() {
+        return repository.findAll();
     }
 }

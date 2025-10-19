@@ -1,11 +1,12 @@
 package com.teixeirah.debugattor.infrastructure.primary;
 
-import com.teixeirah.debugattor.application.usecases.*;
+import com.teixeirah.debugattor.application.input.*;
 import com.teixeirah.debugattor.domain.artifact.Artifact;
 import com.teixeirah.debugattor.domain.artifact.FileMetadata;
-import com.teixeirah.debugattor.domain.execution.Execution;
 import com.teixeirah.debugattor.domain.execution.ExecutionNotFoundException;
-import com.teixeirah.debugattor.domain.step.Step;
+import com.teixeirah.debugattor.infrastructure.primary.dto.ArtifactResponse;
+import com.teixeirah.debugattor.infrastructure.primary.dto.ExecutionResponse;
+import com.teixeirah.debugattor.infrastructure.primary.dto.StepResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,40 +30,44 @@ class ExecutionHttpAdapter {
     private final CompleteStepUseCase completeStepUseCase;
 
     @PostMapping
-    ResponseEntity<Execution> startExecution() {
-        return ResponseEntity.ok(startExecutionUseCase.execute());
+    ResponseEntity<ExecutionResponse> startExecution() {
+        return ResponseEntity.ok(ExecutionResponse.from(startExecutionUseCase.execute()));
     }
 
     @GetMapping
-    ResponseEntity<List<Execution>> fetchExecutions() {
-        List<Execution> executions = fetchExecutionsUseCase.execute();
+    ResponseEntity<List<ExecutionResponse>> fetchExecutions() {
+        List<ExecutionResponse> executions = fetchExecutionsUseCase.execute()
+                .stream()
+                .map(ExecutionResponse::from)
+                .toList();
         return ResponseEntity.ok(executions);
     }
 
     @GetMapping("/{executionId}")
-    ResponseEntity<Execution> getExecutionById(@PathVariable UUID executionId) {
+    ResponseEntity<ExecutionResponse> getExecutionById(@PathVariable UUID executionId) {
         return getExecutionByIdUseCase.execute(executionId)
+                .map(ExecutionResponse::from)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{executionId}/steps")
-    ResponseEntity<Step> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto dto) {
+    ResponseEntity<StepResponse> registerStep(@PathVariable UUID executionId, @RequestBody RegisterStepDto dto) {
         final var step = registerStepUseCase.execute(executionId, dto.name());
-        return ResponseEntity.ok(step);
+        return ResponseEntity.ok(StepResponse.from(step));
     }
 
     public record RegisterStepDto(String name) {
     }
 
     @PostMapping("/{executionId}/steps/{stepId}/artifacts")
-    ResponseEntity<Artifact> logArtifact(@PathVariable UUID executionId, @PathVariable UUID stepId, @RequestBody LogArtifact dto) {
+    ResponseEntity<ArtifactResponse> logArtifact(@PathVariable UUID executionId, @PathVariable UUID stepId, @RequestBody LogArtifact dto) {
         final var artifact = logArtifactUseCase.log(stepId, Artifact.Type.valueOf(dto.type()), dto.description(), dto.content());
-        return ResponseEntity.ok(artifact);
+        return ResponseEntity.ok(ArtifactResponse.from(artifact));
     }
 
     @PostMapping("/{executionId}/steps/{stepId}/artifacts/upload")
-    public ResponseEntity<Artifact> uploadFile(@PathVariable UUID executionId,
+    public ResponseEntity<ArtifactResponse> uploadFile(@PathVariable UUID executionId,
                                                @PathVariable UUID stepId,
                                                @ModelAttribute LogArtifact dto) throws IOException {
         final var file = dto.file();
@@ -74,7 +79,7 @@ class ExecutionHttpAdapter {
                 file.getInputStream(),
                 metadata);
 
-        return ResponseEntity.ok(artifact);
+        return ResponseEntity.ok(ArtifactResponse.from(artifact));
     }
 
     @DeleteMapping("/{executionId}")

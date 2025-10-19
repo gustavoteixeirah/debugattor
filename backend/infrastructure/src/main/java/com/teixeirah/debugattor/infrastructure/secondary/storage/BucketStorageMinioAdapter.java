@@ -1,7 +1,7 @@
 package com.teixeirah.debugattor.infrastructure.secondary.storage;
 
 
-import com.teixeirah.debugattor.application.output.BucketStorageOutputPort;
+import com.teixeirah.debugattor.domain.storage.BucketStorageOutputPort;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;

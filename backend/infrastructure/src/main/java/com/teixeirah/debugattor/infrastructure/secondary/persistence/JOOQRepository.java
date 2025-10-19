@@ -65,6 +65,7 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                 )
                 .from(EXECUTIONS)
                 .orderBy(EXECUTIONS.STARTED_AT.desc())
+                .limit(10)
                 .fetchInto(Execution.class);
     }
 

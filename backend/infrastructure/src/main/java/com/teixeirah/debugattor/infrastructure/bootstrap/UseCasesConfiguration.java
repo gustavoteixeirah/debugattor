@@ -1,11 +1,12 @@
 package com.teixeirah.debugattor.infrastructure.bootstrap;
 
-import com.teixeirah.debugattor.application.output.BucketStorageOutputPort;
+import com.teixeirah.debugattor.application.input.*;
 import com.teixeirah.debugattor.application.usecases.*;
 import com.teixeirah.debugattor.domain.artifact.ArtifactRepository;
 import com.teixeirah.debugattor.domain.events.EventPublisher;
 import com.teixeirah.debugattor.domain.execution.ExecutionRepository;
 import com.teixeirah.debugattor.domain.step.StepRepository;
+import com.teixeirah.debugattor.domain.storage.BucketStorageOutputPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,37 +15,37 @@ public class UseCasesConfiguration {
 
     @Bean
     public StartExecutionUseCase startExecutionUseCase(ExecutionRepository repository) {
-        return new StartExecutionUseCase(repository);
+        return new DefaultStartExecutionUseCase(repository);
     }
 
     @Bean
     public FetchExecutionsUseCase fetchExecutionsUseCase(ExecutionRepository repository) {
-        return new FetchExecutionsUseCase(repository);
+        return new DefaultFetchExecutionsUseCase(repository);
     }
 
     @Bean
     public GetExecutionByIdUseCase getExecutionByIdUseCase(ExecutionRepository repository) {
-        return new GetExecutionByIdUseCase(repository);
+        return new DefaultGetExecutionByIdUseCase(repository);
     }
 
     @Bean
-    public RegisterStepUseCase registerStepUseCase(StepRepository repository,  EventPublisher eventPublisher) {
-        return new RegisterStepUseCase(repository, eventPublisher);
+    public RegisterStepUseCase registerStepUseCase(StepRepository repository, EventPublisher eventPublisher) {
+        return new DefaultRegisterStepUseCase(repository, eventPublisher);
     }
 
     @Bean
-    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository, BucketStorageOutputPort bucketStorage,  EventPublisher eventPublisher) {
-        return new LogArtifactUseCase(repository, bucketStorage, eventPublisher);
+    public LogArtifactUseCase logArtifactUseCase(ArtifactRepository repository, BucketStorageOutputPort bucketStorage, EventPublisher eventPublisher) {
+        return new DefaultLogArtifactUseCase(repository, bucketStorage, eventPublisher);
     }
 
     @Bean
     public DeleteExecutionUseCase deleteExecutionUseCase(ExecutionRepository repository, ArtifactRepository artifactRepository, BucketStorageOutputPort bucketStorage) {
-        return new DeleteExecutionUseCase(repository, artifactRepository, bucketStorage);
+        return new DefaultDeleteExecutionUseCase(repository, artifactRepository, bucketStorage);
     }
 
     @Bean
     public CompleteStepUseCase completeStepUseCase(StepRepository repository) {
-        return new CompleteStepUseCase(repository);
+        return new DefaultCompleteStepUseCase(repository);
     }
 
 }
