@@ -138,6 +138,15 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
     }
 
     @Override
+    public void setFailed(UUID stepId) {
+        context.update(STEPS)
+                .set(STEPS.STATUS, Step.Status.FAILED.name())
+                .set(STEPS.COMPLETED_AT, currentOffsetDateTime())
+                .where(STEPS.ID.eq(stepId))
+                .execute();
+    }
+
+    @Override
     public Artifact log(UUID stepId, Artifact.Type type, String description, String content) {
         try {
             return context.insertInto(ARTIFACTS)
@@ -203,6 +212,24 @@ class JOOQRepository implements ExecutionRepository, StepRepository, ArtifactRep
                 .where(EXECUTIONS.ID.eq(executionId))
                 .execute();
         return deleted > 0;
+    }
+
+    @Override
+    public void complete(UUID id) {
+        context.update(EXECUTIONS)
+                .set(EXECUTIONS.STATUS, Execution.Status.COMPLETED.name())
+                .set(EXECUTIONS.FINISHED_AT, currentOffsetDateTime())
+                .where(EXECUTIONS.ID.eq(id))
+                .execute();
+    }
+
+    @Override
+    public void fail(UUID id) {
+        context.update(EXECUTIONS)
+                .set(EXECUTIONS.STATUS, Execution.Status.FAILED.name())
+                .set(EXECUTIONS.FINISHED_AT, currentOffsetDateTime())
+                .where(EXECUTIONS.ID.eq(id))
+                .execute();
     }
 
     @Override

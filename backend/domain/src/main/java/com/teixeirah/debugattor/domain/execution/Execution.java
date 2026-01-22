@@ -9,5 +9,11 @@ import java.util.UUID;
 import java.time.Instant;
 import java.util.Optional;
 
-public record Execution(UUID id, List<Step> steps, OffsetDateTime startedAt, OffsetDateTime finishedAt) {
+public record Execution(UUID id, Status status, List<Step> steps, OffsetDateTime startedAt, OffsetDateTime finishedAt) {
+
+    public enum Status {
+        RUNNING,
+        COMPLETED,
+        FAILED
+    }
 }

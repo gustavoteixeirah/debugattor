@@ -48,4 +48,18 @@ public class UseCasesConfiguration {
         return new DefaultCompleteStepUseCase(repository);
     }
 
+    @Bean
+    public FailStepUseCase failStepUseCase(StepRepository repository) {
+        return new DefaultFailStepUseCase(repository);
+    }
+
+    @Bean
+    public CompleteExecutionUseCase completeExecutionUseCase(ExecutionRepository repository) {
+        return new DefaultCompleteExecutionUseCase(repository);
+    }
+
+    @Bean
+    public FailExecutionUseCase failExecutionUseCase(ExecutionRepository repository) {
+        return new DefaultFailExecutionUseCase(repository);
+    }
 }

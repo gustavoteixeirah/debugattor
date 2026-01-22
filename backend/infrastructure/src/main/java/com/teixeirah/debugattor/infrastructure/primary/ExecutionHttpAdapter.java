@@ -28,6 +28,9 @@ class ExecutionHttpAdapter {
     private final LogArtifactUseCase logArtifactUseCase;
     private final DeleteExecutionUseCase deleteExecutionUseCase;
     private final CompleteStepUseCase completeStepUseCase;
+    private final FailStepUseCase failStepUseCase;
+    private final CompleteExecutionUseCase completeExecutionUseCase;
+    private final FailExecutionUseCase failExecutionUseCase;
 
     @PostMapping
     ResponseEntity<ExecutionResponse> startExecution() {
@@ -95,6 +98,24 @@ class ExecutionHttpAdapter {
     @PostMapping("/{executionId}/steps/{stepId}/complete")
     ResponseEntity<Void> completeStep(@PathVariable UUID executionId, @PathVariable UUID stepId) {
         completeStepUseCase.execute(stepId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{executionId}/steps/{stepId}/fail")
+    ResponseEntity<Void> failStep(@PathVariable UUID executionId, @PathVariable UUID stepId) {
+        failStepUseCase.execute(stepId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{executionId}/complete")
+    ResponseEntity<Void> completeExecution(@PathVariable UUID executionId) {
+        completeExecutionUseCase.execute(executionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{executionId}/fail")
+    ResponseEntity<Void> failExecution(@PathVariable UUID executionId) {
+        failExecutionUseCase.execute(executionId);
         return ResponseEntity.noContent().build();
     }
 

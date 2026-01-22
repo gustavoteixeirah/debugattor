@@ -12,4 +12,8 @@ public interface ExecutionRepository {
     Optional<Execution> findById(UUID id);
 
     boolean deleteById(UUID id);
+
+    void complete(UUID id);
+
+    void fail(UUID id);
 }

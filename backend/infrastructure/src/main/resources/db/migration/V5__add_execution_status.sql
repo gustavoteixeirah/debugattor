@@ -1,0 +1,2 @@
+ALTER TABLE executions ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'RUNNING';
+ALTER TABLE executions ADD CONSTRAINT ck_executions_status CHECK (status IN ('RUNNING', 'COMPLETED', 'FAILED'));

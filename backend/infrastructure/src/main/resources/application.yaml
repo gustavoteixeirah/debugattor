@@ -1,3 +1,5 @@
+server:
+  port: 8125
 spring:
   application:
     name: debugattor
@@ -5,7 +7,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:debugattor}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:debugattor}
     username: ${DB_USERNAME:debugattor}
     password: ${DB_PASSWORD:debugattor}
     driver-class-name: org.postgresql.Driver
