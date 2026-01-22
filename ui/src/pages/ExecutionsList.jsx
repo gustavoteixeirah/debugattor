@@ -2,8 +2,74 @@ import { useEffect, useState } from 'react'
 import { fetchExecutions } from '@/api/executions'
 import { formatDateTime } from '@/lib/time-utils'
 import { useNavigate } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { Trash2, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { TimeAgo } from '@/components/TimeAgo'
+
+const StatusBadge = ({ status }) => {
+  const getStatusConfig = () => {
+    switch (status) {
+      case 'COMPLETED':
+        return {
+          icon: CheckCircle2,
+          label: 'Sucesso',
+          bgColor: 'rgba(34, 197, 94, 0.15)',
+          borderColor: 'rgba(34, 197, 94, 0.3)',
+          textColor: '#22c55e',
+          iconColor: '#22c55e'
+        }
+      case 'FAILED':
+        return {
+          icon: XCircle,
+          label: 'Falhou',
+          bgColor: 'rgba(239, 68, 68, 0.15)',
+          borderColor: 'rgba(239, 68, 68, 0.3)',
+          textColor: '#ef4444',
+          iconColor: '#ef4444'
+        }
+      case 'RUNNING':
+        return {
+          icon: Loader2,
+          label: 'Executando',
+          bgColor: 'rgba(59, 130, 246, 0.15)',
+          borderColor: 'rgba(59, 130, 246, 0.3)',
+          textColor: '#3b82f6',
+          iconColor: '#3b82f6'
+        }
+      default:
+        return {
+          icon: Loader2,
+          label: 'Desconhecido',
+          bgColor: 'rgba(156, 163, 175, 0.15)',
+          borderColor: 'rgba(156, 163, 175, 0.3)',
+          textColor: '#9ca3af',
+          iconColor: '#9ca3af'
+        }
+    }
+  }
+
+  const config = getStatusConfig()
+  const Icon = config.icon
+
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '4px 10px',
+        borderRadius: 6,
+        backgroundColor: config.bgColor,
+        border: `1px solid ${config.borderColor}`,
+        fontSize: 12,
+        fontWeight: 600,
+        color: config.textColor
+      }}
+    >
+      <Icon size={14} style={{ color: config.iconColor }} />
+      <span>{config.label}</span>
+    </div>
+  )
+}
 
 export default function ExecutionsList() {
   const [executions, setExecutions] = useState([])
@@ -34,12 +100,12 @@ export default function ExecutionsList() {
 
   const confirmDelete = async () => {
     if (!deleteModal) return
-    
+
     try {
       const response = await fetch(`/api/executions/${deleteModal}`, {
         method: 'DELETE',
       })
-      
+
       if (response.ok) {
         setExecutions(prev => prev.filter(exec => exec.id !== deleteModal))
         setDeleteModal(null)
@@ -57,15 +123,15 @@ export default function ExecutionsList() {
 
   useEffect(() => {
     let mounted = true
-    ;(async () => {
-      try {
-        const data = await fetchExecutions()
-        if (mounted) setExecutions(data)
-      } catch (e) {
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    })()
+      ; (async () => {
+        try {
+          const data = await fetchExecutions()
+          if (mounted) setExecutions(data)
+        } catch (e) {
+        } finally {
+          if (mounted) setLoading(false)
+        }
+      })()
     return () => { mounted = false }
   }, [])
 
@@ -86,8 +152,11 @@ export default function ExecutionsList() {
                 onClick={() => navigate(`/executions/${e.id}`)}
                 style={{ cursor: 'pointer', textAlign: 'left', border: '1px solid #2f2f2f', background: '#1e1e1e', borderRadius: 10, padding: 12, color: '#ddd' }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontWeight: 700, color: '#fff' }}>Execution {String(e.id).slice(0, 8)}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontWeight: 700, color: '#fff' }}>Execution {String(e.id).slice(0, 8)}</div>
+                    {e.status && <StatusBadge status={e.status} />}
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontSize: 12, color: '#aaa' }}>Steps: {(e.steps || []).length}</div>
                     <button
@@ -109,7 +178,7 @@ export default function ExecutionsList() {
                     </button>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 13, color: '#aaa' }}>
+                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: '#aaa' }}>
                   <span>Started <TimeAgo date={e.startedAt} /></span>
                   <span>Finished {e.finishedAt ? <TimeAgo date={e.finishedAt} /> : '-'}</span>
                 </div>
@@ -118,9 +187,9 @@ export default function ExecutionsList() {
           </div>
         )}
       </div>
-      
+
       {deleteModal && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -135,7 +204,7 @@ export default function ExecutionsList() {
           }}
           onClick={cancelDelete}
         >
-          <div 
+          <div
             style={{
               background: '#1e1e1e',
               border: '1px solid #3a3a3a',

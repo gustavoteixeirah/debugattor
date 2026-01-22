@@ -10,6 +10,7 @@ export interface Artifact {
 }
 
 export type StepStatus = 'RUNNING' | 'COMPLETED' | 'FAILED';
+export type ExecutionStatus = 'RUNNING' | 'COMPLETED' | 'FAILED';
 
 export interface Step {
   id: string;
@@ -24,6 +25,7 @@ export interface Step {
 
 export interface Execution {
   id: string;
+  status?: ExecutionStatus;
   steps: Step[];
   startedAt?: string;
   finishedAt?: string | null;
