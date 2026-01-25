@@ -1,0 +1,36 @@
+server:
+  port: 8125
+
+spring:
+  application:
+    name: debugattor
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:debugattor}
+    username: ${DB_USERNAME:debugattor}
+    password: ${DB_PASSWORD:debugattor}
+    driver-class-name: org.postgresql.Driver
+  jooq:
+    sql-dialect: postgres
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    validate-migration-naming: true
+  jackson:
+    time-zone: America/Sao_Paulo
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 15MB
+      max-request-size: 20MB
+
+vaadin:
+  launch-browser: true
+
+minio:
+  url: http://localhost:9000
+  publicUrl: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: artifacts

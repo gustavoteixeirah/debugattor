@@ -1,0 +1,28 @@
+package com.kodegt.debugattor.infrastructure.primary.dto;
+
+import com.kodegt.debugattor.domain.execution.Execution;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+public record ExecutionResponse(
+        UUID id,
+        String status,
+        OffsetDateTime startedAt,
+        OffsetDateTime finishedAt,
+        List<StepResponse> steps
+) {
+    public static ExecutionResponse from(Execution execution) {
+        List<StepResponse> stepResponses = execution.steps() == null
+                ? List.of()
+                : execution.steps().stream().map(StepResponse::from).toList();
+        return new ExecutionResponse(
+                execution.id(),
+                execution.status().name(),
+                execution.startedAt(),
+                execution.finishedAt(),
+                stepResponses
+        );
+    }
+}

@@ -1,0 +1,85 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.10'
+    id "org.jooq.jooq-codegen-gradle" version "3.20.6"
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.vaadin' version '24.9.9'
+}
+
+group = 'com.kodegt'
+version = '1.0.0'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+    maven { url = "https://maven.vaadin.com/vaadin-addons" }
+    maven { url "https://maven.vaadin.com/vaadin-prereleases" }
+    maven { url "https://plugins.gradle.org/m2/" }
+}
+
+ext {
+	set('vaadinVersion', "24.9.9")
+	set('jooqVersion', "3.20.6")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'com.vaadin:vaadin-spring-boot-starter'
+
+    implementation 'io.minio:minio:8.5.7'
+
+    implementation "org.jooq:jooq:${jooqVersion}"
+    jooqCodegen "org.jooq:jooq-meta:${jooqVersion}"
+    jooqCodegen "org.jooq:jooq-codegen:${jooqVersion}"
+    jooqCodegen "org.jooq:jooq-meta-extensions:${jooqVersion}"
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	runtimeOnly 'org.postgresql:postgresql'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+	}
+}
+
+test { useJUnitPlatform() }
+
+tasks.named("compileJava") {
+    dependsOn(tasks.named("jooqCodegen"))
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "build/generated-sources/jooq"
+        }
+    }
+}
+
+jooq {
+    configuration {
+        generator {
+            database {
+                name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                properties {
+                    property { key = "scripts"; value = "src/main/resources/db/migration/*.sql" }
+                    property { key = "sort"; value = "flyway" }
+                    property { key = "unqualifiedSchema"; value = "none" }
+                    property { key = "defaultNameCase"; value = "as_is" }
+                }
+            }
+        }
+    }
+}

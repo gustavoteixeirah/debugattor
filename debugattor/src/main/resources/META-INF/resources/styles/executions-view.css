@@ -1,0 +1,269 @@
+/* executions-view.css */
+/* Place this file in src/main/resources/META-INF/resources/styles/ */
+
+/* Main container */
+.executions-view {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Grid dark theme overrides */
+vaadin-grid.executions-grid {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+vaadin-grid.executions-grid::part(header-cell) {
+    background-color: #252525;
+    color: #cccccc;
+    font-weight: 600;
+    border-bottom: 2px solid #3a3a3a;
+}
+
+vaadin-grid.executions-grid::part(row) {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+vaadin-grid.executions-grid::part(row):hover {
+    background-color: #252525;
+}
+
+vaadin-grid.executions-grid::part(cell) {
+    border-bottom: 1px solid #2a2a2a;
+    padding: 12px;
+}
+
+/* Alternate row coloring */
+vaadin-grid.executions-grid vaadin-grid-cell-content[slot$="even"] {
+    background-color: #1f1f1f;
+}
+
+/* Row status styling */
+vaadin-grid.executions-grid .execution-completed::part(row) {
+    border-left: 3px solid #4ade80;
+}
+
+vaadin-grid.executions-grid .execution-failed::part(row) {
+    border-left: 3px solid #f87171;
+}
+
+vaadin-grid.executions-grid .execution-running::part(row) {
+    border-left: 3px solid #60a5fa;
+}
+
+/* Search field dark theme */
+vaadin-text-field.executions-search {
+    --lumo-contrast-10pct: #2a2a2a;
+    --lumo-contrast-20pct: #3a3a3a;
+    --lumo-base-color: #252525;
+    --lumo-body-text-color: #ffffff;
+    --lumo-secondary-text-color: #999999;
+}
+
+vaadin-text-field.executions-search::part(input-field) {
+    background-color: #252525;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+vaadin-text-field.executions-search::part(input-field):focus {
+    border-color: #60a5fa;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.completed {
+    background-color: #064e3b;
+    color: #4ade80;
+}
+
+.status-badge.failed {
+    background-color: #7f1d1d;
+    color: #f87171;
+}
+
+.status-badge.running {
+    background-color: #1e3a8a;
+    color: #60a5fa;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.action-button:hover {
+    background-color: #3a3a3a;
+}
+
+.action-button.view {
+    color: #60a5fa;
+}
+
+.action-button.delete {
+    color: #f87171;
+}
+
+/* Header styling */
+.executions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.executions-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.refresh-button {
+    background-color: #2a2a2a;
+    color: #999999;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refresh-button:hover {
+    background-color: #3a3a3a;
+    color: #ffffff;
+}
+
+/* Confirm dialog dark theme */
+vaadin-confirm-dialog-overlay::part(overlay) {
+    background-color: #252525;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+}
+
+vaadin-confirm-dialog::part(header) {
+    color: #ffffff;
+    background-color: #252525;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+vaadin-confirm-dialog::part(message) {
+    color: #cccccc;
+    background-color: #252525;
+}
+
+vaadin-confirm-dialog::part(footer) {
+    background-color: #252525;
+    border-top: 1px solid #3a3a3a;
+}
+
+/* Loading indicator */
+.loading-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: #999999;
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: #999999;
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #4a4a4a;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #cccccc;
+}
+
+.empty-state-message {
+    font-size: 14px;
+    color: #999999;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .executions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    vaadin-grid.executions-grid::part(cell) {
+        padding: 8px;
+        font-size: 12px;
+    }
+}
+
+/* Animation for row hover */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+vaadin-grid.executions-grid::part(row) {
+    animation: fadeIn 0.3s ease-out;
+}
